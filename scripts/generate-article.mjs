@@ -236,6 +236,8 @@ INSTRUCCIONES:
 - Incluye tabla comparativa si es relevante (ej. equipamiento)
 - Precios en euros (2026), usa SIEMPRE 2026
 - Entre 4 y 8 links de Amazon integrados naturalmente: <a href="${amazonBase}TÉRMINO" target="_blank" rel="nofollow sponsored" class="amazon-link">texto</a>
+- Enlaza naturalmente a 2-3 de estos artículos relacionados del sitio cuando sea relevante (usa el HTML exacto):
+${related.length > 0 ? related.join('\n') : '(sin artículos relacionados aún)'}
 
 ESTRUCTURA JSON (devuelve ÚNICAMENTE el JSON):
 {
@@ -266,7 +268,7 @@ async function main() {
   const slot = parseInt(process.env.ARTICLE_SLOT ?? '0', 10)
   const slotBank = KEYWORD_BANK.filter((_, i) => i % 2 === slot)
 
-  const { data: existing } = await supabase.from('articles').select('focus_keyword')
+  const { data: existing } = await supabase.from('articles').select('focus_keyword, title, slug')
   const usedKeywords = new Set((existing || []).map(a => a.focus_keyword?.toLowerCase().trim()))
 
   const next = slotBank.find(([kw]) => !usedKeywords.has(kw.toLowerCase().trim()))
@@ -277,6 +279,14 @@ async function main() {
 
   const [keyword, categoryId, categoryName] = next
   console.log(`Generating article for: "${keyword}" (${categoryName})`)
+
+  // Pick 3 related articles for internal linking
+  const siteUrl = process.env.SITE_URL || 'https://fitnessdesdecasa.es'
+  const published = (existing || []).filter(a => a.slug && a.title)
+  const related = published
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 6)
+    .map(a => `- <a href="${siteUrl}/articulo/${a.slug}">${a.title}</a>`)
 
   let parsed
   for (let attempt = 1; attempt <= 3; attempt++) {
