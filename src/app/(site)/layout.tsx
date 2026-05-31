@@ -14,10 +14,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:bg-blue-700 transition-colors">
-                SO
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:bg-green-700 transition-colors">
+                FC
               </div>
-              <span className="font-bold text-gray-900 text-lg hidden sm:block">Setup Oficina</span>
+              <span className="font-bold text-gray-900 text-lg hidden sm:block">Fitness Desde Casa</span>
             </Link>
 
             {/* Nav */}
@@ -59,16 +59,16 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 mt-20">
-        <div className="h-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600" />
+        <div className="h-1 bg-gradient-to-r from-green-600 via-emerald-500 to-green-600" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">SO</div>
-                <span className="text-white font-bold text-lg">Setup Oficina</span>
+                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">FC</div>
+                <span className="text-white font-bold text-lg">Fitness Desde Casa</span>
               </div>
               <p className="text-sm leading-relaxed max-w-xs">
-                Guías, comparativas y consejos honestos para crear tu espacio de trabajo ideal en casa.
+                Rutinas, ejercicios y consejos para ponerte en forma desde casa — sin gimnasio, con resultados reales.
               </p>
               <p className="text-xs mt-4 text-gray-600">
                 Algunos enlaces son de afiliado Amazon. Esto no afecta nuestras recomendaciones.
@@ -100,8 +100,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             </div>
           </div>
           <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-600">
-            <p>© 2026 Setup Oficina. Todos los derechos reservados.</p>
-            <p>Hecho con ❤️ para trabajadores remotos en España</p>
+            <p>© 2026 Fitness Desde Casa. Todos los derechos reservados.</p>
+            <p>Hecho con ❤️ para personas que entrenan en casa en España</p>
           </div>
         </div>
       </footer>

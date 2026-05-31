@@ -10,11 +10,12 @@ export const metadata: Metadata = {
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
-  'sillas-de-oficina': '🪑',
-  'escritorios': '🖥️',
-  'monitores': '🖥️',
-  'iluminacion': '💡',
-  'productividad': '⚡',
+  'ejercicios-en-casa': '🏋️',
+  'rutinas': '📅',
+  'equipamiento-fitness': '🥊',
+  'nutricion': '🥗',
+  'perdida-de-peso': '🔥',
+  'suplementos': '💊',
 }
 
 export default async function HomePage() {
@@ -30,30 +31,37 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%), radial-gradient(circle at 75% 75%, #06b6d4 0%, transparent 50%)'
-        }} />
+      <section className="relative text-white overflow-hidden" style={{ minHeight: '480px' }}>
+        {/* Background fitness photo */}
+        <Image
+          src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80"
+          alt="Fitness desde casa"
+          fill
+          className="object-cover object-center"
+          unoptimized
+          priority
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/30" />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-sm text-blue-300 mb-6">
-              <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-1.5 text-sm text-green-300 mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               Guías actualizadas 2026
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-              El setup de oficina
-              <span className="block gradient-text">perfecto en casa</span>
+              Ponte en forma
+              <span className="block text-green-400">desde casa</span>
             </h1>
-            <p className="text-lg text-gray-300 mb-8 max-w-xl">
-              Comparativas honestas, guías de compra y consejos reales para montar tu espacio de trabajo ideal — sin gastar de más.
+            <p className="text-lg text-gray-200 mb-8 max-w-xl">
+              Rutinas, ejercicios y consejos reales para entrenar en casa — sin excusas, sin gimnasio, con resultados.
             </p>
             <div className="flex flex-wrap gap-3">
               {categories.slice(0, 4).map((cat) => (
                 <Link key={cat.id} href={`/categoria/${cat.slug}`}
                   className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-medium transition-all hover:scale-105">
-                  {CATEGORY_ICONS[cat.slug] || '📦'} {cat.name}
+                  {CATEGORY_ICONS[cat.slug] || '💪'} {cat.name}
                 </Link>
               ))}
             </div>
@@ -76,8 +84,8 @@ export default async function HomePage() {
                 {featured.image_url ? (
                   <Image src={featured.image_url} alt={featured.title} fill className="object-cover" unoptimized />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                    <span className="text-4xl">🪑</span>
+                  <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                    <span className="text-4xl">💪</span>
                   </div>
                 )}
                 {featured.category && (
