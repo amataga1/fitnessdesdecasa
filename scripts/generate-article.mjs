@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import slugify from 'slugify'
 
-const AMAZON_TAG = process.env.AMAZON_TAG || 'setupoficina-21'
+const AMAZON_TAG = process.env.AMAZON_TAG || 'fitnessencasa09f-21'
 
 const KEYWORD_BANK = [
   ['ejercicios para bajar de peso en casa sin equipamiento', 'c2caf22e-04e9-4e38-a984-51c22914c223', 'Ejercicios en Casa'],
