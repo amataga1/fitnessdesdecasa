@@ -180,31 +180,42 @@ const KEYWORD_BANK = [
   ['suplementos que realmente funcionan para ganar músculo', '1c2353e9-5381-41dd-a8ec-2181122cd4a8', 'Suplementos'],
 ]
 
-const TOPIC_IMAGES = {
-  ejercicio: ['photo-1571019613454-1cb2f99b2d8b','photo-1534438327276-14e5300c3a48','photo-1517836357463-d25dfeac3438','photo-1574680096145-d05b474e2155'],
-  rutina: ['photo-1549060279-7e168fcee0c2','photo-1594737626072-2d1c8e69c0a7','photo-1571019614242-c5c5dee9f50b','photo-1541534741688-6078c6bfb5c5'],
-  equipamiento: ['photo-1571731956672-f2b94d7dd0cb','photo-1583454110551-21f2fa2afe61','photo-1518611012118-696072aa579a','photo-1526506118085-60ce8714f8c5'],
-  nutricion: ['photo-1490645935967-10de6ba17061','photo-1512621776951-a57141f2eefd','photo-1559181567-c3190bbbbd4c','photo-1567521464027-f127ff144326'],
-  default: ['photo-1517836357463-d25dfeac3438','photo-1571019613454-1cb2f99b2d8b','photo-1534438327276-14e5300c3a48','photo-1549060279-7e168fcee0c2'],
-}
+// Fallback pool — only used if Unsplash API fails
+const FALLBACK_IMAGES = [
+  'photo-1571019613454-1cb2f99b2d8b','photo-1534438327276-14e5300c3a48',
+  'photo-1517836357463-d25dfeac3438','photo-1574680096145-d05b474e2155',
+  'photo-1549060279-7e168fcee0c2','photo-1571731956672-f2b94d7dd0cb',
+  'photo-1490645935967-10de6ba17061','photo-1512621776951-a57141f2eefd',
+  'photo-1583454110551-21f2fa2afe61','photo-1526506118085-60ce8714f8c5',
+]
 
-const KEYWORD_MAP = {
-  ejercicio:'ejercicio', flexion:'ejercicio', sentadilla:'ejercicio', burpee:'ejercicio', plank:'ejercicio', cardio:'ejercicio', abdomi:'ejercicio', gluteo:'ejercicio',
-  rutina:'rutina', plan:'rutina', entrenamiento:'rutina', semana:'rutina', minuto:'rutina', hiit:'rutina', calistenia:'rutina',
-  mancuerna:'equipamiento', barra:'equipamiento', esterilla:'equipamiento', kettlebell:'equipamiento', bicicleta:'equipamiento', cinta:'equipamiento', trx:'equipamiento', foam:'equipamiento', banco:'equipamiento',
-  dieta:'nutricion', proteina:'nutricion', caloria:'nutricion', comer:'nutricion', alimento:'nutricion', meal:'nutricion', ayuno:'nutricion', carbohidrato:'nutricion',
-  suplemento:'nutricion', whey:'nutricion', creatina:'nutricion', bcaa:'nutricion', magnesio:'nutricion', vitamina:'nutricion', omega:'nutricion',
-  perder:'default', adelgazar:'default', grasa:'default', peso:'default', kilo:'default',
-}
-
-function getImageForKeyword(keyword) {
-  const kw = keyword.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-  let topic = 'default'
-  for (const [fragment, mapped] of Object.entries(KEYWORD_MAP)) {
-    if (kw.includes(fragment)) { topic = mapped; break }
+async function getImageForKeyword(keyword) {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY
+  if (accessKey) {
+    try {
+      // Use English translation of key fitness terms for better Unsplash results
+      const kwEn = keyword
+        .replace(/ejercicio|ejercicios/gi, 'exercise')
+        .replace(/entrenamiento|entrenar/gi, 'workout')
+        .replace(/rutina/gi, 'fitness routine')
+        .replace(/casa/gi, 'home')
+        .replace(/pérdida de peso|adelgazar|perder peso/gi, 'weight loss')
+        .replace(/nutrición|dieta/gi, 'healthy food')
+        .replace(/suplementos?/gi, 'sports supplement')
+        .replace(/equipamiento/gi, 'fitness equipment')
+        .replace(/mancuernas/gi, 'dumbbells')
+        .replace(/sentadillas/gi, 'squats')
+        .replace(/flexiones/gi, 'push ups')
+      const q = encodeURIComponent(kwEn.substring(0, 50))
+      const res = await fetch(`https://api.unsplash.com/photos/random?query=${q}&orientation=landscape&client_id=${accessKey}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.urls?.regular) return data.urls.regular
+      }
+    } catch {}
   }
-  const pool = TOPIC_IMAGES[topic] ?? TOPIC_IMAGES.default
-  const photoId = pool[Math.floor(Math.random() * pool.length)]
+  // Fallback to curated pool
+  const photoId = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)]
   return `https://images.unsplash.com/${photoId}?w=1200&q=80`
 }
 
