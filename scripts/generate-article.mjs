@@ -187,35 +187,59 @@ const FALLBACK_IMAGES = [
   'photo-1549060279-7e168fcee0c2','photo-1571731956672-f2b94d7dd0cb',
   'photo-1490645935967-10de6ba17061','photo-1512621776951-a57141f2eefd',
   'photo-1583454110551-21f2fa2afe61','photo-1526506118085-60ce8714f8c5',
+  'photo-1544367567-0f2fcb009e0b','photo-1581009137042-c552e485697a',
+  'photo-1540497077202-7c8a3999166f','photo-1579758629938-03607ccdbaba',
+  'photo-1594737625785-a6cbdabd333c','photo-1616279969965-9c5aeee64f12',
+  'photo-1599058945522-28d584b6f0ff','photo-1504593811423-6dd665756598',
+  'photo-1558618666-fcd25c85cd64','photo-1600881333168-2ef49b341f30',
+  'photo-1570172619644-dfd03ed5d881','photo-1517838277536-f5f99be501cd',
+  'photo-1507398941214-572c25f4b1dc','photo-1576678927484-cc907957088c',
+  'photo-1622979135225-d2ba269cf1ac','photo-1605296867304-46d5465a13f1',
+  'photo-1601422407692-ec4eeec1d9b3','photo-1518611012118-696072aa579a',
+  'photo-1592632789003-f34af9d7aaac','photo-1574680178050-55c6a6a96e0a',
 ]
 
-async function getImageForKeyword(keyword) {
+function extractPhotoId(url) {
+  const m = url.match(/\/(photo-[^/?]+)/)
+  return m ? m[1] : url
+}
+
+async function getImageForKeyword(keyword, usedImageUrls = new Set()) {
+  const usedIds = new Set([...usedImageUrls].map(extractPhotoId))
   const accessKey = process.env.UNSPLASH_ACCESS_KEY
+
   if (accessKey) {
-    try {
-      // Use English translation of key fitness terms for better Unsplash results
-      const kwEn = keyword
-        .replace(/ejercicio|ejercicios/gi, 'exercise')
-        .replace(/entrenamiento|entrenar/gi, 'workout')
-        .replace(/rutina/gi, 'fitness routine')
-        .replace(/casa/gi, 'home')
-        .replace(/pérdida de peso|adelgazar|perder peso/gi, 'weight loss')
-        .replace(/nutrición|dieta/gi, 'healthy food')
-        .replace(/suplementos?/gi, 'sports supplement')
-        .replace(/equipamiento/gi, 'fitness equipment')
-        .replace(/mancuernas/gi, 'dumbbells')
-        .replace(/sentadillas/gi, 'squats')
-        .replace(/flexiones/gi, 'push ups')
-      const q = encodeURIComponent(kwEn.substring(0, 50))
-      const res = await fetch(`https://api.unsplash.com/photos/random?query=${q}&orientation=landscape&client_id=${accessKey}`)
-      if (res.ok) {
-        const data = await res.json()
-        if (data.urls?.regular) return data.urls.regular
-      }
-    } catch {}
+    const kwEn = keyword
+      .replace(/ejercicio|ejercicios/gi, 'exercise')
+      .replace(/entrenamiento|entrenar/gi, 'workout')
+      .replace(/rutina/gi, 'fitness routine')
+      .replace(/casa/gi, 'home')
+      .replace(/pérdida de peso|adelgazar|perder peso/gi, 'weight loss')
+      .replace(/nutrición|dieta/gi, 'healthy food')
+      .replace(/suplementos?/gi, 'sports supplement')
+      .replace(/equipamiento/gi, 'fitness equipment')
+      .replace(/mancuernas/gi, 'dumbbells')
+      .replace(/sentadillas/gi, 'squats')
+      .replace(/flexiones/gi, 'push ups')
+    const q = encodeURIComponent(kwEn.substring(0, 50))
+    // Try up to 5 times to get a photo not already used
+    for (let i = 0; i < 5; i++) {
+      try {
+        const res = await fetch(`https://api.unsplash.com/photos/random?query=${q}&orientation=landscape&client_id=${accessKey}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.urls?.regular && !usedIds.has(extractPhotoId(data.urls.regular))) {
+            return data.urls.regular
+          }
+        }
+      } catch {}
+    }
   }
-  // Fallback to curated pool
-  const photoId = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)]
+
+  // Fallback: pick a photo from the pool that hasn't been used yet
+  const available = FALLBACK_IMAGES.filter(id => !usedIds.has(id))
+  const pool = available.length > 0 ? available : FALLBACK_IMAGES
+  const photoId = pool[Math.floor(Math.random() * pool.length)]
   return `https://images.unsplash.com/${photoId}?w=1200&q=80`
 }
 
@@ -285,8 +309,9 @@ async function main() {
     process.exit(0)
   }
 
-  const { data: existing } = await supabase.from('articles').select('focus_keyword, title, slug')
+  const { data: existing } = await supabase.from('articles').select('focus_keyword, title, slug, image_url')
   const usedKeywords = new Set((existing || []).map(a => a.focus_keyword?.toLowerCase().trim()))
+  const usedImageUrls = new Set((existing || []).map(a => a.image_url).filter(Boolean))
 
   const next = slotBank.find(([kw]) => !usedKeywords.has(kw.toLowerCase().trim()))
   if (!next) {
@@ -323,7 +348,7 @@ async function main() {
     }
   }
 
-  const imageUrl = await getImageForKeyword(keyword)
+  const imageUrl = await getImageForKeyword(keyword, usedImageUrls)
   const wordCount = String(parsed.content).split(/\s+/).filter(Boolean).length
   const baseSlug = slugify(String(parsed.slug || parsed.title), { lower: true, strict: true, locale: 'es' })
 
