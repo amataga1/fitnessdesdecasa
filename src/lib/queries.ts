@@ -9,7 +9,7 @@ import type { Article, Category, Keyword, SiteStats } from '@/types'
 
 export async function getPublishedArticles(limit = 10, offset = 0): Promise<Article[]> {
   'use cache'
-  cacheLife('hours')
+  cacheLife('minutes')
   cacheTag('articles')
 
   const supabase = createPublicClient()
@@ -27,7 +27,7 @@ export async function getPublishedArticles(limit = 10, offset = 0): Promise<Arti
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   'use cache'
-  cacheLife('days')
+  cacheLife('minutes')
   cacheTag('articles', `article-${slug}`)
 
   const supabase = createPublicClient()
@@ -45,7 +45,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 
 export async function getCategories(): Promise<Category[]> {
   'use cache'
-  cacheLife('days')
+  cacheLife('minutes')
   cacheTag('categories')
 
   const supabase = createPublicClient()
@@ -61,7 +61,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getArticlesByCategory(categorySlug: string, limit = 10): Promise<Article[]> {
   'use cache'
-  cacheLife('hours')
+  cacheLife('minutes')
   cacheTag('articles', `category-${categorySlug}`)
 
   const supabase = createPublicClient()
@@ -80,7 +80,7 @@ export async function getArticlesByCategory(categorySlug: string, limit = 10): P
 
 export async function getRelatedArticles(articleId: string, categoryId: string, limit = 4): Promise<Article[]> {
   'use cache'
-  cacheLife('hours')
+  cacheLife('minutes')
   cacheTag('articles')
 
   const supabase = createPublicClient()
