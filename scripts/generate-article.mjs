@@ -268,6 +268,23 @@ async function main() {
   const slot = parseInt(process.env.ARTICLE_SLOT ?? '0', 10)
   const slotBank = KEYWORD_BANK.filter((_, i) => i % 2 === slot)
 
+  // Idempotency guard: if an article was already published today for this slot, skip
+  const todayStart = new Date()
+  todayStart.setUTCHours(0, 0, 0, 0)
+  const slotStart = new Date(todayStart)
+  slotStart.setUTCHours(slot === 0 ? 0 : 9)
+  const slotEnd = new Date(todayStart)
+  slotEnd.setUTCHours(slot === 0 ? 9 : 23, 59, 59)
+  const { data: slotArticles } = await supabase
+    .from('articles')
+    .select('id, title')
+    .gte('created_at', slotStart.toISOString())
+    .lte('created_at', slotEnd.toISOString())
+  if (slotArticles && slotArticles.length > 0) {
+    console.log(`Slot ${slot} already has an article published today ("${slotArticles[0].title}") — skipping to avoid duplicate.`)
+    process.exit(0)
+  }
+
   const { data: existing } = await supabase.from('articles').select('focus_keyword, title, slug')
   const usedKeywords = new Set((existing || []).map(a => a.focus_keyword?.toLowerCase().trim()))
 
