@@ -240,7 +240,7 @@ async function getImageForKeyword(keyword, usedImageUrls = new Set()) {
   const available = FALLBACK_IMAGES.filter(id => !usedIds.has(id))
   const pool = available.length > 0 ? available : FALLBACK_IMAGES
   const photoId = pool[Math.floor(Math.random() * pool.length)]
-  return `https://images.unsplash.com/${photoId}?w=1200&q=80`
+  return `https://images.unsplash.com/${photoId}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80`
 }
 
 function buildPrompt(keyword, categoryName, related = []) {
