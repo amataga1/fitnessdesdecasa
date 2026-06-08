@@ -38,8 +38,18 @@ async function ArticleContent({ slug }: { slug: string }) {
     image: article.image_url,
     datePublished: article.published_at,
     dateModified: article.updated_at,
-    author: { '@type': 'Organization', name: process.env.NEXT_PUBLIC_SITE_NAME },
-    publisher: { '@type': 'Organization', name: process.env.NEXT_PUBLIC_SITE_NAME },
+    author: {
+      '@type': 'Person',
+      name: 'Albert Mata',
+      jobTitle: 'Entusiasta del Fitness en Casa',
+      url: 'https://fitnessdesdecasa.es/sobre-nosotros',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Fitness Desde Casa',
+      url: 'https://fitnessdesdecasa.es',
+      logo: { '@type': 'ImageObject', url: 'https://fitnessdesdecasa.es/favicon.ico' },
+    },
   }
 
   const faqSchema = article.faqs?.length ? {
@@ -95,10 +105,13 @@ async function ArticleContent({ slug }: { slug: string }) {
           <p className="text-xl text-gray-500 leading-relaxed mb-6 font-light">{article.excerpt}</p>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 pb-8 border-b border-gray-100">
-            <div className="flex items-center gap-1.5">
-              <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">SO</div>
-              <span>Setup Oficina</span>
-            </div>
+            <Link href="/sobre-nosotros" className="flex items-center gap-2 hover:text-green-600 transition-colors group">
+              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">AM</div>
+              <div>
+                <span className="font-semibold text-gray-700 group-hover:text-green-600 block leading-tight">Albert Mata</span>
+                <span className="text-xs text-gray-400 leading-tight">Fitness en Casa</span>
+              </div>
+            </Link>
             <span>·</span>
             <span>Actualizado el {formatDate(article.updated_at)}</span>
             <span>·</span>
@@ -132,6 +145,29 @@ async function ArticleContent({ slug }: { slug: string }) {
           "
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
+
+        {/* Author bio card */}
+        <div className="mt-12 border border-gray-200 rounded-2xl p-6 bg-gray-50 flex gap-5 items-start">
+          <div className="flex-shrink-0">
+            <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-md">AM</div>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-bold text-gray-900">Albert Mata</span>
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Autor</span>
+            </div>
+            <p className="text-xs text-gray-500 mb-2">Fitness en Casa · +6 años entrenando sin gimnasio</p>
+            <p className="text-sm text-gray-600">
+              Apasionado del fitness con más de 6 años entrenando exclusivamente en casa. Ha analizado
+              y probado decenas de equipos deportivos para ayudar a españoles a ponerse en forma sin
+              necesidad de gimnasio. Todo el contenido está basado en experiencia real y en el análisis
+              riguroso de productos y rutinas.
+            </p>
+            <Link href="/sobre-nosotros" className="inline-block mt-3 text-sm text-green-600 hover:underline font-medium">
+              Conoce más sobre el autor →
+            </Link>
+          </div>
+        </div>
 
         {/* FAQs */}
         {article.faqs && article.faqs.length > 0 && (
