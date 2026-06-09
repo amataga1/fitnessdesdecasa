@@ -295,17 +295,17 @@ async function main() {
   // Idempotency guard: if an article was already published today for this slot, skip
   const todayStart = new Date()
   todayStart.setUTCHours(0, 0, 0, 0)
-  const slotStart = new Date(todayStart)
-  slotStart.setUTCHours(slot === 0 ? 0 : 9)
-  const slotEnd = new Date(todayStart)
-  slotEnd.setUTCHours(slot === 0 ? 9 : 23, 59, 59)
+  // Idempotency: check if any keyword from THIS slot's bank was already published today
+  const slotKeywords = slotBank.map(([kw]) => kw.toLowerCase().trim())
   const { data: slotArticles } = await supabase
     .from('articles')
-    .select('id, title')
-    .gte('created_at', slotStart.toISOString())
-    .lte('created_at', slotEnd.toISOString())
-  if (slotArticles && slotArticles.length > 0) {
-    console.log(`Slot ${slot} already has an article published today ("${slotArticles[0].title}") — skipping to avoid duplicate.`)
+    .select('id, title, focus_keyword')
+    .gte('created_at', todayStart.toISOString())
+  const alreadyPublished = (slotArticles || []).find(a =>
+    slotKeywords.includes((a.focus_keyword || '').toLowerCase().trim())
+  )
+  if (alreadyPublished) {
+    console.log(`Slot ${slot} already has an article published today ("${alreadyPublished.title}") — skipping to avoid duplicate.`)
     process.exit(0)
   }
 
